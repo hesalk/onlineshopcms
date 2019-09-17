@@ -16,16 +16,26 @@ class main extends Component {
             entries: [],
             current: this.props.match.params.page || 1,
             total: 0,
-            hash: 1
+            hash: 1,
+            filter:{stock:"4"}
         }
     }
     componentDidMount() {
         console.log("ss")
-        get('https://hesh.devspace.host/api/collections/get/products', null, 3, 3 * (this.props.match.params.page - 1)).then((res) => {
+        get('https://hesh.devspace.host/api/collections/get/products', this.state.filter, 3, 3 * (this.props.match.params.page - 1)).then((res) => {
             console.log(res)
             this.setState({entries: res.entries, total: res.total})
             console.log(this.state.entries)
         })
+    }
+    componentDidUpdate(prevProps, nextState) {
+        if (prevProps.match.params.page !== this.props.match.params.page) {
+            get('https://hesh.devspace.host/api/collections/get/products', null, 3, 3 * (this.props.match.params.page - 1)).then((res) => {
+            console.log(res)
+            this.setState({entries: res.entries, total: res.total})
+            console.log(this.state.entries)
+        })
+        }
     }
     onChange = (page) => {
         this.props.history.push("/home/page/" + page);
