@@ -7,6 +7,7 @@ import Card from 'react-bootstrap/Card'
 import Button from 'react-bootstrap/Button'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
+import Form from 'react-bootstrap/Form'
 import Col from 'react-bootstrap/Col'
 
 class main extends Component {
@@ -17,12 +18,13 @@ class main extends Component {
             current: this.props.match.params.page || 1,
             total: 0,
             hash: 1,
-            filter:{stock:"4"}
+            filter:{},
+            search:""
         }
     }
     componentDidMount() {
         console.log("ss")
-        get('https://hesh.devspace.host/api/collections/get/products', this.state.filter, 3, 3 * (this.props.match.params.page - 1)).then((res) => {
+        get('https://hesh.devspace.host/api/collections/get/products', null, 3, 3 * (this.props.match.params.page - 1)).then((res) => {
             console.log(res)
             this.setState({entries: res.entries, total: res.total})
             console.log(this.state.entries)
@@ -30,6 +32,23 @@ class main extends Component {
     }
     componentDidUpdate(prevProps, nextState) {
         if (prevProps.match.params.page !== this.props.match.params.page) {
+            get('https://hesh.devspace.host/api/collections/get/products', null, 3, 3 * (this.props.match.params.page - 1)).then((res) => {
+            console.log(res)
+            this.setState({entries: res.entries, total: res.total})
+            console.log(this.state.entries)
+        })
+        }
+    }
+    oncheck = (e)=>{
+        console.log(e.target.checked)
+        if(e.target.checked){
+            get('https://hesh.devspace.host/api/collections/get/products', {instock:true}, 3, 3 * (this.props.match.params.page - 1)).then((res) => {
+                console.log(res)
+                this.setState({entries: res.entries, total: res.total})
+                console.log(this.state.entries)
+            })
+        }
+        else {
             get('https://hesh.devspace.host/api/collections/get/products', null, 3, 3 * (this.props.match.params.page - 1)).then((res) => {
             console.log(res)
             this.setState({entries: res.entries, total: res.total})
@@ -50,9 +69,35 @@ class main extends Component {
             this.setState({entries: res.entries, total: res.total})
         })
       }
+      press = (e)=>{
+        let code = e.keycode || e.which;
+        console.log(code)
+        console.log(this.state.search)
+        if (code === 13){
+            get('https://hesh.devspace.host/api/collections/get/products', {name:this.state.search}, 3, 3 * (this.props.match.params.page - 1)).then((res) => {
+                console.log(res)
+                this.setState({entries: res.entries, total: res.total})
+                console.log(this.state.entries)
+            })
+        }
+        if(this.state.search === ""){
+            console.log("wtf")
+        }
+      }
+      clear = ()=>{
+        this.setState({search:""})
+        get('https://hesh.devspace.host/api/collections/get/products', null, 3, 3 * (this.props.match.params.page - 1)).then((res) => {
+            console.log(res)
+            this.setState({entries: res.entries, total: res.total})
+            console.log(this.state.entries)
+        })
+      }
     render() {
         return (
             <div className="main">
+                    <Form.Check type="checkbox" label="show in stock only" onChange={this.oncheck} />
+                    <Form.Control size="lg" value={this.state.search} type="text" onKeyPress={this.press} placeholder="Search for a product by name" onChange={(e)=>{this.setState({search:e.target.value})}}/>
+                    <Button variant="warning" onClick={this.clear}>clear</Button>
                 <Container>
   <Row>
             {this.state.entries.map((x,i)=>
@@ -65,7 +110,7 @@ class main extends Component {
                                      
                                      
                                   </Card.Text>
-                                  <Link to={"/home/"+x._id}><Button variant="primary">Read the articel</Button></Link>
+                                  <Link to={"/home/"+x._id}><Button variant="primary">See the product</Button></Link>
                                 </Card.Body>
                               </Card>
                             </Col>
