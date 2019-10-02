@@ -166,11 +166,11 @@ class prodpage extends Component {
                                 <Form onSubmit={this.submit}>
                                     <Form.Group controlId="formGridAddress1">
                                         <Form.Label>title</Form.Label>
-                                        <Form.Control placeholder="1234 Main St"/>
+                                        <Form.Control required placeholder="1234 Main St"/>
                                     </Form.Group>
                                     <Form.Group controlId="exampleForm.ControlTextarea1">
                                         <Form.Label>Example textarea</Form.Label>
-                                        <Form.Control as="textarea" rows="3"/>
+                                        <Form.Control required as="textarea" rows="3"/>
                                     </Form.Group>
 
                                     <Form.Row>
